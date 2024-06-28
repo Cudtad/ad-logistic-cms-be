@@ -1,0 +1,32 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ROOT
+  ADMIN
+  MANAGER
+  SALE
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  unitId       Int?
+  email        String    @unique @db.VarChar(55)
+  name         String?   @db.VarChar(55)
+  role         Role
+  password     String    @db.VarChar(255)
+  lastLoggedIn DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  isActive     Boolean   @default(true)
+  isDeleted    Boolean   @default(false)
+}
