@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  ndexpress-be:
+    image: ndexpress-be
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '${PORT:-6001}:${PORT:-6001}'
+    volumes:
+      - ./.env:/usr/src/app/.env
