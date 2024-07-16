@@ -29,4 +29,230 @@ model User {
   updatedAt    DateTime  @updatedAt
   isActive     Boolean   @default(true)
   isDeleted    Boolean   @default(false)
+  unit         Unit?     @relation(fields: [unitId], references: [id])
+  order        Order[]
+}
+
+model Unit {
+  id          Int         @id @default(autoincrement())
+  name        String      @db.VarChar(255)
+  code        String      @unique @db.VarChar(10)
+  description String?     @db.VarChar(2000)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  zones       Zone[]
+  users       User[]
+  orders      Order[]
+  unitConfig  UnitConfig?
+}
+
+model UnitConfig {
+  id              Int      @id @default(autoincrement())
+  unitId          Int      @unique
+  orderProcessFee Int
+  accountRentFee  Float
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  unit            Unit?    @relation(fields: [unitId], references: [id])
+}
+
+model Zone {
+  id          Int          @id @default(autoincrement())
+  name        String       @db.VarChar(55)
+  description String?      @db.VarChar(2000)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  address     ZoneAddress?
+  units       Unit[]
+  orders      Order[]
+}
+
+model ZoneAddress {
+  id        Int      @id @default(autoincrement())
+  zoneId    Int      @unique
+  name      String   @db.VarChar(255)
+  phone     String   @db.VarChar(25)
+  email     String   @db.VarChar(255)
+  lines     String[]
+  suburb    String   @db.VarChar(255)
+  state     String   @db.VarChar(255)
+  country   String   @db.VarChar(255)
+  postcode  String   @db.VarChar(25)
+  updatedAt DateTime @updatedAt
+  zone      Zone     @relation(fields: [zoneId], references: [id])
+}
+
+enum ShipmentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum ShipmentType {
+  DOMESTIC
+  INTERNATIONAL
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  BANK_TRANSFER
+  PAY_ID
+  UNKNOWN
+}
+
+enum PaymentStatus {
+  UN_PAID
+  PARTIAL_PAID
+  PAID
+}
+
+model Shipment {
+  id                     Int            @id @default(autoincrement())
+  orderId                Int
+  createdBy              Int
+  code                   String         @db.VarChar(25)
+  from                   Json
+  to                     Json
+  status                 ShipmentStatus
+  type                   ShipmentType
+  paymentMethod          PaymentMethod  @default(UNKNOWN)
+  paymentStatus          PaymentStatus
+  length                 Float
+  height                 Float
+  width                  Float
+  weight                 Float
+  shippingPrice          Int            @default(0)
+  shipmentPrice          Int            @default(0)
+  approvedAt             DateTime?
+  metadata               Json
+  shipmentId             String?
+  shipmentTrackingNumber String?
+  shipmentOrderId        String?
+  shipmentSummary        Json
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+  shipmentItems          ShipmentItem[]
+  Order                  Order?         @relation(fields: [orderId], references: [id])
+}
+
+model ShipmentItem {
+  id                      Int       @id @default(autoincrement())
+  orderId                 Int
+  shipmentId              Int
+  sku                     String    @db.VarChar(25)
+  name                    String    @db.VarChar(255)
+  description             String    @db.VarChar(255)
+  quantity                Int
+  length                  Float
+  height                  Float
+  width                   Float
+  weight                  Float
+  metadata                Json
+  shipmentItemId          String    @db.VarChar(55)
+  shipmentSku             String    @db.VarChar(255)
+  shipmentItemProductId   String    @db.VarChar(25)
+  shipmentItemSummary     Json
+  shipmentTrackingDetails Json
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  shipment                Shipment? @relation(fields: [shipmentId], references: [id])
+  order                   Order?    @relation(fields: [orderId], references: [id])
+}
+
+enum OrderStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+  ERROR
+}
+
+enum OrderType {
+  FFM
+  EPACKET
+}
+
+model Order {
+  id                    Int            @id @default(autoincrement())
+  createdBy             Int
+  zoneId                Int
+  unitId                Int
+  code                  String         @unique @db.VarChar(25)
+  status                OrderStatus
+  type                  OrderType
+  metadata              Json
+  paidPrice             Int
+  totalPrice            Int
+  shipmentOrderId       String         @db.VarChar(55)
+  shipmentStatus        String         @db.VarChar(55)
+  shipmentPaymentMethod String         @db.VarChar(55)
+  shipmentOrderSummary  Json
+  shipmentOrderMetadata Json
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+  creator               User           @relation(fields: [createdBy], references: [id])
+  unit                  Unit           @relation(fields: [unitId], references: [id])
+  zone                  Zone           @relation(fields: [zoneId], references: [id])
+  shipments             Shipment[]
+  shipmentItems         ShipmentItem[]
+  imageIds              Int[]
+  labelUrl              String?
+}
+
+model Label {
+  id                Int      @id @default(autoincrement())
+  createdBy         Int
+  code              String   @db.VarChar(55)
+  metadata          Json
+  shipmentRequestId String   @db.VarChar(255)
+  shipmentLabelUrl  String   @db.VarChar(2000)
+  shipmentStatus    String   @db.VarChar(25)
+  shipmentMetadata  Json
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Image {
+  id        Int      @id @default(autoincrement())
+  createdBy Int
+  path      String
+  width     Int
+  height    Int
+  size      Int
+  format    String
+  etag      String
+  inUse     Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model AuspostLog {
+  id        Int      @id @default(autoincrement())
+  request   String   @db.VarChar(2000)
+  response  Json
+  createdAt DateTime @default(now())
+}
+
+model AuspostErrorLog {
+  id         Int      @id @default(autoincrement())
+  statusCode String   @db.VarChar(10)
+  request    String   @db.VarChar(2000)
+  response   Json
+  createdAt  DateTime @default(now())
+}
+
+enum NotificationStatus {
+  READ
+  UNREAD
+}
+
+model Notification {
+  id        Int                @id @default(autoincrement())
+  userId    Int
+  message   String
+  type      String             @db.VarChar(25)
+  status    NotificationStatus
+  metadata  Json
+  createdAt DateTime           @default(now())
 }

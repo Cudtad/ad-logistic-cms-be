@@ -1,12 +1,31 @@
 version: '3.8'
 
 services:
-  ndexpress-be:
-    image: ndexpress-be
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: adlogistic
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
+    restart: always
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://postgres:changeme@postgres:5432/adlogistic
+      # Replace with your actual database URL from Prisma
     ports:
-      - '${PORT:-6001}:${PORT:-6001}'
-    volumes:
-      - ./.env:/usr/src/app/.env
+      - "3000:3000"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:

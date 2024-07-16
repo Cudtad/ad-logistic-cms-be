@@ -47,28 +47,28 @@ async function main() {
   //   },
   // });
 
-  // const zone = await prisma.zone.upsert({
-  //   where: {
-  //     id: 1,
-  //   },
-  //   update: {},
-  //   create: {
-  //     name: 'Australia',
-  //     description: 'Australia Zone',
-  //     address: {
-  //       create: {
-  //         name: 'ND Express Test',
-  //         email: 'ndexpress-test@ndexpress.com',
-  //         phone: '0488888888',
-  //         lines: ['46 Lucerne Street', 'Belmore'],
-  //         suburb: 'BELMORE',
-  //         country: 'AU',
-  //         state: 'NSW',
-  //         postcode: '2192',
-  //       },
-  //     },
-  //   },
-  // });
+  const zone = await prisma.zone.upsert({
+    where: {
+      id: 1,
+    },
+    update: {},
+    create: {
+      name: 'Australia',
+      description: 'Australia Zone',
+      address: {
+        create: {
+          name: 'AD Logistic test',
+          email: 'adlogistic-test@ndexpress.com',
+          phone: '0488888888',
+          lines: ['46 Lucerne Street', 'Belmore'],
+          suburb: 'BELMORE',
+          country: 'AU',
+          state: 'NSW',
+          postcode: '2192',
+        },
+      },
+    },
+  });
 
   // const unit = await prisma.unit.upsert({
   //   where: {

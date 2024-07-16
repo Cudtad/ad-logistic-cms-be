@@ -16,6 +16,8 @@ import { CaslModule } from './casl/casl.module';
 // import { StorageModule } from './storage/storage.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { Config, Environment } from './configuration/config.interface';
+import { UnitModule } from './unit/unit.module';
+import { ZonesModule } from './zones/zones.module';
 // import { AnalyticsModule } from './analytics/analytics.module';
 // import { Config, Environment } from './configuration/config.interface';
 // import { NotificationsModule } from './notifications/notifications.module';
@@ -58,8 +60,8 @@ import { Config, Environment } from './configuration/config.interface';
     AuthModule,
     UsersModule,
     CaslModule,
-    // UnitsModule,
-    // ZonesModule,
+    UnitModule,
+    ZonesModule,
     // AuspostModule,
     // OrdersModule,
     // StorageModule,

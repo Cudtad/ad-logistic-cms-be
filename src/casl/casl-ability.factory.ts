@@ -4,11 +4,11 @@ import { Injectable } from '@nestjs/common';
 import {
   User,
   Role,
-  // Unit,
-  // Zone,
-  // Image,
-  // Order,
-  // Notification,
+  Unit,
+  Zone,
+  Image,
+  Order,
+  Notification,
   // OrderStatus,
   // NotificationStatus,
 } from '@prisma/client';
@@ -17,11 +17,11 @@ import { Action, OrderAction } from './casl.constants';
 type TSubjects =
   | Subjects<{
       User: User;
-      // Unit: Unit;
-      // Zone: Zone;
-      // Image: Image;
-      // Order: Order;
-      // Notification: Notification;
+      Unit: Unit;
+      Zone: Zone;
+      Image: Image;
+      Order: Order;
+      Notification: Notification;
     }>
   | 'all'
   | 'Analytics';

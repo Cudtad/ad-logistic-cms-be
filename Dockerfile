@@ -1,57 +1,24 @@
-###################
-# BUILD FOR LOCAL DEVELOPMENT
-###################
+# Dockerfile
+# Sử dụng một base image Node.js phiên bản 18
+FROM node:18-alpine
 
-FROM node:18-alpine As development
+# Thiết lập thư mục làm việc trong container
+WORKDIR /app
 
-RUN apk add --no-cache python3 make g++ 
+# Sao chép package.json và package-lock.json vào thư mục làm việc
+COPY package*.json ./
 
-WORKDIR /usr/src/app
+# Cài đặt các dependencies cả runtime và development
+RUN npm install
 
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci --force; \
-  elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i; \
-  else yarn install; \
-  fi
+# Sao chép mã nguồn của ứng dụng vào container
+COPY . .
 
-COPY --chown=node:node . .
+# Build ứng dụng NestJS
+RUN npm run build
 
-USER node
+# Expose cổng mà ứng dụng chạy trên (port mặc định của NestJS là 3000)
+EXPOSE 3000
 
-###################
-# BUILD FOR PRODUCTION
-###################
-
-FROM node:18-alpine As build
-
-WORKDIR /usr/src/app
-
-COPY --chown=node:node package*.json ./
-
-COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modules
-
-COPY --chown=node:node . .
-
-RUN yarn prisma:generate
-RUN yarn build
-
-ENV NODE_ENV production
-
-USER node
-
-###################
-# PRODUCTION
-###################
-
-FROM node:18-alpine As production
-
-WORKDIR /usr/src/app
-
-COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node --from=build /usr/src/app/prisma ./prisma
-COPY --chown=node:node --from=build /usr/src/app/dist ./dist
-COPY --chown=node:node --from=build /usr/src/app/package.json ./package.json
-
-CMD [ "node", "dist/src/main.js" ]
+# Khởi chạy ứng dụng khi container được khởi động
+CMD ["node", "dist/main"]
