@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "Role" AS ENUM ('ROOT', 'ADMIN', 'MANAGER', 'SALE');
+
+-- CreateEnum
 CREATE TYPE "ShipmentStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'CANCELLED');
 
 -- CreateEnum
@@ -20,6 +23,23 @@ CREATE TYPE "OrderType" AS ENUM ('FFM', 'EPACKET');
 CREATE TYPE "NotificationStatus" AS ENUM ('READ', 'UNREAD');
 
 -- CreateTable
+CREATE TABLE "User" (
+    "id" SERIAL NOT NULL,
+    "unitId" INTEGER,
+    "email" VARCHAR(55) NOT NULL,
+    "name" VARCHAR(55),
+    "role" "Role" NOT NULL,
+    "password" VARCHAR(255) NOT NULL,
+    "lastLoggedIn" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Unit" (
     "id" SERIAL NOT NULL,
     "name" VARCHAR(255) NOT NULL,
@@ -27,6 +47,7 @@ CREATE TABLE "Unit" (
     "description" VARCHAR(2000),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Unit_pkey" PRIMARY KEY ("id")
 );
@@ -222,6 +243,9 @@ CREATE TABLE "_UnitToZone" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Unit_code_key" ON "Unit"("code");

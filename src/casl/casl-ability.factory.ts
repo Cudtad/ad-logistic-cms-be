@@ -44,18 +44,18 @@ export class CaslAbilityFactory {
         can(Action.Manage, 'all');
         break;
       case Role.MANAGER:
-        // can(Action.Manage, 'User', { role: Role.SALE });
+        can(Action.Manage, 'User', { role: Role.SALE });
         can(Action.Read, 'User', { role: Role.SALE });
-        // can(Action.Read, 'Zone');
-        // can(Action.Read, 'Unit');
+        can(Action.Read, 'Zone');
+        can(Action.Read, 'Unit');
         // can(Action.Update, 'Order', { status: OrderStatus.PENDING });
-        // can(Action.Read, 'Order');
-        // can(OrderAction.APPROVE, 'Order');
-        // can(OrderAction.REJECT, 'Order');
+        can(Action.Read, 'Order');
+        can(OrderAction.APPROVE, 'Order');
+        can(OrderAction.REJECT, 'Order');
         break;
       case Role.SALE:
-        // can(Action.Read, 'Order', { unitId: user.unitId, createdBy: user.id });
-        // can(Action.Create, 'Order');
+        can(Action.Read, 'Order', { unitId: user.unitId, createdBy: user.id });
+        can(Action.Create, 'Order');
         // can(Action.Update, 'Order', {
         //   createdBy: user.id,
         //   status: {

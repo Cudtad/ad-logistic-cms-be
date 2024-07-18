@@ -21,6 +21,16 @@ export class UpdateUnitDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsString()
+  code?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Min(1, { each: true })
+  zoneIds?: number[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
   @ValidateNested()
   config?: UpdateConfigDto;
 }

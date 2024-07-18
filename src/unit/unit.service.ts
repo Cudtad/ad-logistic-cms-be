@@ -63,7 +63,6 @@ export class UnitService {
     const unit = await this.prismaService.unit.findUnique({
       where: { id },
     });
-
     if (!unit) {
       throw new Error('Unit not found');
     }
@@ -84,11 +83,22 @@ export class UnitService {
       });
     }
 
+    const zones = await this.prismaService.zone.findMany({
+      where: {
+        id: {
+          in: data.zoneIds,
+        },
+      },
+    });
+
     const updatedUnit = await this.prismaService.unit.update({
       where: { id },
       data: {
         name: data.name ?? unit.name,
         description: data.description ?? unit.description,
+        zones: {
+          set: zones.map((zone) => ({ id: zone.id })),
+        },
       },
       include: {
         zones: true,
@@ -100,7 +110,7 @@ export class UnitService {
   }
 
   async findAll(query: ListUnitsQueryDto) {
-    const where: Prisma.UnitWhereInput = {};
+    const where: Prisma.UnitWhereInput = { isDeleted: false };
     if (query.q) {
       where.name = { contains: query.q, mode: 'insensitive' };
     }
@@ -119,6 +129,9 @@ export class UnitService {
         skip: query.skip,
         take: query.limit,
         orderBy: query.orderBy,
+        include: {
+          zones: true,
+        },
       }),
       this.prismaService.unit.count({ where }),
     ]);
@@ -127,5 +140,17 @@ export class UnitService {
       rows,
       total,
     };
+  }
+
+  async delete(id: number) {
+    const deleteUnit = await this.findById(id);
+    if (!deleteUnit) {
+      throw new BadRequestException('Unit not found');
+    }
+
+    return this.prismaService.unit.update({
+      where: { id },
+      data: { isDeleted: true },
+    });
   }
 }

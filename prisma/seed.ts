@@ -15,10 +15,10 @@ async function main() {
   const adminPassword = await bcrypt.hash('123456a@A', bcryptSaltOrRound);
 
   const root = await prisma.user.upsert({
-    where: { email: 'root@ndexpress.vn' },
+    where: { email: 'root@adlogistic.vn' },
     update: {},
     create: {
-      email: 'root@ndexpress.vn',
+      email: 'root@adlogistic.vn',
       name: 'Root',
       role: Role.ROOT,
       password: adminPassword,
@@ -26,10 +26,10 @@ async function main() {
   });
 
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@ndexpress.vn' },
+    where: { email: 'admin@adlogistic.vn' },
     update: {},
     create: {
-      email: 'admin@ndexpress.vn',
+      email: 'admin@adlogistic.vn',
       name: 'Admin',
       role: Role.ADMIN,
       password: adminPassword,
@@ -47,28 +47,55 @@ async function main() {
   //   },
   // });
 
-  const zone = await prisma.zone.upsert({
-    where: {
+  const zones = [
+    {
       id: 1,
-    },
-    update: {},
-    create: {
       name: 'Australia',
       description: 'Australia Zone',
       address: {
-        create: {
-          name: 'AD Logistic test',
-          email: 'adlogistic-test@ndexpress.com',
-          phone: '0488888888',
-          lines: ['46 Lucerne Street', 'Belmore'],
-          suburb: 'BELMORE',
-          country: 'AU',
-          state: 'NSW',
-          postcode: '2192',
-        },
+        name: 'AD Logistic test',
+        email: 'adlogistic-test@ndexpress.com',
+        phone: '0488888888',
+        lines: ['46 Lucerne Street', 'Belmore'],
+        suburb: 'BELMORE',
+        country: 'AU',
+        state: 'NSW',
+        postcode: '2192',
       },
     },
-  });
+    {
+      id: 2,
+      name: 'USA',
+      description: 'USA Zone',
+      address: {
+        name: 'US Logistic test',
+        email: 'uslogistic-test@ndexpress.com',
+        phone: '0123456789',
+        lines: ['123 Main Street', 'Anytown'],
+        suburb: 'ANYTOWN',
+        country: 'US',
+        state: 'CA',
+        postcode: '90001',
+      },
+    },
+  ];
+
+  for (const zoneData of zones) {
+    const zone = await prisma.zone.upsert({
+      where: {
+        id: zoneData.id,
+      },
+      update: {},
+      create: {
+        name: zoneData.name,
+        description: zoneData.description,
+        address: {
+          create: zoneData.address,
+        },
+      },
+    });
+    console.log(`Zone ${zone.name} has been upserted.`);
+  }
 
   // const unit = await prisma.unit.upsert({
   //   where: {
